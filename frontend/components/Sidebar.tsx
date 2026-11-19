@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { usePageContext } from 'vike-react/usePageContext'
+import { href, isCurrent } from '../lib/links'
 import { useTodos } from '../lib/store'
 
 const COLORS = ['#570df8', '#f000b8', '#37cdbe', '#f59e0b', '#22c55e', '#ef4444', '#3b82f6']
@@ -26,23 +27,23 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
     setOpen(false)
   }
 
-  const link = (href: string) => (current === href ? 'menu-active font-semibold' : '')
+  const link = (path: string) => (isCurrent(current, path) ? 'menu-active font-semibold' : '')
 
   return (
     <aside className="flex h-full w-72 flex-col gap-2 bg-base-200 p-4">
-      <a href="/" className="mb-2 flex items-center gap-2 px-2 text-xl font-bold">
+      <a href={href('/')} className="mb-2 flex items-center gap-2 px-2 text-xl font-bold">
         <span aria-hidden>✅</span>
         {t('app.title')}
       </a>
 
       <ul className="menu w-full gap-0.5 rounded-box p-0">
         <li>
-          <a href="/" className={link('/')} onClick={onNavigate}>
+          <a href={href('/')} className={link('/')} onClick={onNavigate}>
             🏠 {t('nav.dashboard')}
           </a>
         </li>
         <li>
-          <a href="/settings" className={link('/settings')} onClick={onNavigate}>
+          <a href={href('/settings')} className={link('/settings')} onClick={onNavigate}>
             ⚙️ {t('nav.settings')}
           </a>
         </li>
@@ -55,11 +56,11 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           <li className="px-3 py-2 text-sm opacity-60">{t('project.empty')}</li>
         )}
         {projects.map((p) => {
-          const href = `/project/${p.id}`
+          const path = `/project?id=${p.id}`
           const pct = p.taskCount ? Math.round((p.doneCount / p.taskCount) * 100) : 0
           return (
             <li key={p.id}>
-              <a href={href} className={link(href)} onClick={onNavigate}>
+              <a href={href(path)} className={link(path)} onClick={onNavigate}>
                 <span aria-hidden>{p.emoji}</span>
                 <span className="flex-1 truncate">{p.name}</span>
                 <span className="badge badge-sm" style={{ backgroundColor: p.color, color: '#fff', border: 0 }}>

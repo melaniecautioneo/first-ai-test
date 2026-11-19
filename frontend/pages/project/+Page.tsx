@@ -1,17 +1,24 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { usePageContext } from 'vike-react/usePageContext'
-import { Filters } from '../../../components/Filters'
-import { Stats } from '../../../components/Stats'
-import { TaskComposer } from '../../../components/TaskComposer'
-import { TaskList } from '../../../components/TaskList'
-import { useTodos } from '../../../lib/store'
+import { Filters } from '../../components/Filters'
+import { Stats } from '../../components/Stats'
+import { TaskComposer } from '../../components/TaskComposer'
+import { TaskList } from '../../components/TaskList'
+import { href, projectIdFromUrl } from '../../lib/links'
+import { useTodos } from '../../lib/store'
 
-/** Page d'un projet : /project/3 */
+/**
+ * Page d'un projet : /project?id=3
+ *
+ * Pourquoi `?id=` plutôt que `/project/3` ? Parce qu'un hébergeur statique
+ * comme GitHub Pages ne sait servir que des fichiers existants : une seule
+ * page `/project/index.html` couvre ainsi TOUS les projets, sans bricolage.
+ */
 export default function Page() {
   const { t } = useTranslation()
   const pageContext = usePageContext()
-  const id = Number((pageContext.routeParams as Record<string, string>).id)
+  const id = projectIdFromUrl(pageContext)
   const { projects, updateProject, deleteProject, loading } = useTodos()
   const project = projects.find((p) => p.id === id)
   const [renaming, setRenaming] = useState(false)
@@ -78,7 +85,7 @@ export default function Page() {
                 onClick={async () => {
                   if (window.confirm(t('project.deleteConfirm', { name: project.name }))) {
                     await deleteProject(project.id)
-                    window.location.href = '/'
+                    window.location.href = href('/')
                   }
                 }}
               >

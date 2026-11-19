@@ -130,5 +130,31 @@
     "title": "Oops",
     "network": "Cannot reach the API ({{url}}). Is the Rust server running?",
     "generic": "Something went wrong: {{message}}"
+  },
+  "sync": {
+    "title": "Sync",
+    "disabled": "Local mode",
+    "offline": "Offline",
+    "syncing": "Syncing…",
+    "synced": "Synced",
+    "error": "Sync error",
+    "pending_one": "{{count}} pending change",
+    "pending_other": "{{count}} pending changes",
+    "upToDate": "Everything is sent",
+    "now": "Sync now",
+    "last": "Last sync: {{date}}",
+    "never": "never",
+    "dropped": "{{count}} change(s) rejected by the server and dropped.",
+    "localOnly": "No server configured: data stays in this browser.",
+    "offlineHint": "Server unreachable. Your changes are kept and will be sent when the network is back."
+  },
+  "data": {
+    "title": "Data",
+    "storage": "Your tasks are stored in this browser (localStorage).",
+    "reset": "Reset local data",
+    "resetConfirm": "Erase all data in this browser and reload the demo?",
+    "export": "Export (JSON)",
+    "import": "Import (JSON)",
+    "importError": "Invalid file."
   }
 }

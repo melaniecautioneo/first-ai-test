@@ -1,6 +1,7 @@
 import '../css/tailwind.css'
 import React from 'react'
 import { usePageContext } from 'vike-react/usePageContext'
+import { projectIdFromUrl } from '../lib/links'
 import { I18nProvider } from '../components/Providers'
 import { Sidebar } from '../components/Sidebar'
 import { Topbar } from '../components/Topbar'
@@ -12,8 +13,8 @@ import { TodoProvider } from '../lib/store'
  */
 export default function LayoutDefault({ children }: { children: React.ReactNode }) {
   const pageContext = usePageContext()
-  const rawId = (pageContext.routeParams as Record<string, string> | undefined)?.id
-  const projectId = rawId && /^\d+$/.test(rawId) ? Number(rawId) : null
+  // Le projet courant vient de l'URL : /project?id=5
+  const projectId = projectIdFromUrl(pageContext)
 
   return (
     <I18nProvider>

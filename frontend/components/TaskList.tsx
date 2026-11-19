@@ -14,18 +14,27 @@ export function TaskList() {
 
   const editing: Task | null = tasks.find((x) => x.id === editingId) ?? null
 
-  if (error) return <ErrorBanner message={error} onRetry={() => void reload()} />
+  // Les données viennent du stockage local : une erreur de synchronisation
+  // ne doit JAMAIS empêcher d'afficher ni de modifier ses tâches.
   if (loading) return <Spinner />
-  if (tasks.length === 0) return <EmptyState filtered={countActiveFilters(filters) > 0} />
 
   return (
     <>
-      <p className="px-1 text-sm opacity-60">{t('task.count', { count: tasks.length })}</p>
-      <ul className="space-y-2">
-        {tasks.map((task) => (
-          <TaskItem key={task.id} task={task} onEdit={(x) => setEditingId(x.id)} />
-        ))}
-      </ul>
+      {error && <ErrorBanner message={error} onRetry={() => void reload()} />}
+
+      {tasks.length === 0 ? (
+        <EmptyState filtered={countActiveFilters(filters) > 0} />
+      ) : (
+        <>
+          <p className="px-1 text-sm opacity-60">{t('task.count', { count: tasks.length })}</p>
+          <ul className="space-y-2">
+            {tasks.map((task) => (
+              <TaskItem key={task.id} task={task} onEdit={(x) => setEditingId(x.id)} />
+            ))}
+          </ul>
+        </>
+      )}
+
       <TaskModal task={editing} onClose={() => setEditingId(null)} />
     </>
   )

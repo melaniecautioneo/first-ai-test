@@ -11,9 +11,9 @@ mod model;
 use async_graphql::http::GraphiQLSource;
 use async_graphql_axum::GraphQL;
 use axum::{
+    Router,
     response::{Html, IntoResponse},
     routing::get,
-    Router,
 };
 use tokio::net::TcpListener;
 use tower_http::cors::{Any, CorsLayer};

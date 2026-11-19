@@ -8,7 +8,10 @@ export default {
   title: 'Tâches — Todo',
   description: 'Gestionnaire de tâches : Vike + React + daisyUI + i18next / Rust + GraphQL + SQLite',
   extends: vikeReact,
-  // Rendu serveur activé (SSR) : le HTML arrive déjà construit,
-  // les données sont ensuite chargées côté client via GraphQL.
-  ssr: true
+  // Rendu serveur activé (SSR) en développement.
+  ssr: true,
+  // Pré-rendu : `npm run build` écrit des fichiers HTML statiques, ce qui
+  // permet d'héberger le site sur GitHub Pages (qui ne fait tourner
+  // aucun serveur).
+  prerender: true
 } satisfies Config

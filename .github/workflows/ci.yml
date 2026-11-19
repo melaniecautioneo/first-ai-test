@@ -1,0 +1,59 @@
+# Vérifie que le projet compile à chaque push / pull request.
+# (Rien n'est déployé ici : c'est le filet de sécurité.)
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend (Rust)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend
+      - name: Compiler
+        run: cargo build --locked
+      - name: Analyse statique
+        run: cargo clippy -- -D warnings
+      - name: Démarrer l'API et l'interroger
+        run: |
+          ./target/debug/todo-backend &
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8080/health && break
+            sleep 1
+          done
+          curl -sf -X POST http://localhost:8080/graphql \
+            -H 'Content-Type: application/json' \
+            -d '{"query":"{ projects { id name } stats { total } }"}' | tee /tmp/out.json
+          grep -q '"projects"' /tmp/out.json
+
+  frontend:
+    name: Frontend (Vike)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: Vérifier les types
+        run: npm run typecheck
+      - name: Construire
+        run: npm run build

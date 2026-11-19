@@ -153,6 +153,8 @@ pub struct TaskPatch {
     pub priority: Option<Priority>,
     pub status: Option<TaskStatus>,
     pub due_at: Option<DateTime<Utc>>,
+    /// Position manuelle (utilisée par la synchronisation hors ligne).
+    pub position: Option<f64>,
     #[graphql(default)]
     pub clear_due_at: bool,
     #[graphql(default)]

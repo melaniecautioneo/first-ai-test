@@ -2,8 +2,10 @@
 import { useTranslation } from 'react-i18next'
 import { usePageContext } from 'vike-react/usePageContext'
 import { LANGUAGES, setLanguage, type LanguageCode } from '../lib/i18n'
+import { isCurrent, projectIdFromUrl } from '../lib/links'
 import { useTodos } from '../lib/store'
 import { THEMES, useTheme, type Theme } from './Providers'
+import { SyncBadge } from './SyncBadge'
 
 export function Topbar() {
   const { t, i18n } = useTranslation()
@@ -11,12 +13,12 @@ export function Topbar() {
   const { projects, busy } = useTodos()
   const pageContext = usePageContext()
 
-  const projectId = Number((pageContext.routeParams as Record<string, string>)?.id)
+  const projectId = projectIdFromUrl(pageContext)
   const project = projects.find((p) => p.id === projectId)
 
   const heading = project
     ? `${project.emoji} ${project.name}`
-    : pageContext.urlPathname === '/settings'
+    : isCurrent(pageContext.urlPathname, '/settings')
       ? t('settings.title')
       : t('nav.allTasks')
 
@@ -34,6 +36,7 @@ export function Topbar() {
       </div>
 
       <div className="flex flex-none gap-1">
+        <SyncBadge />
         <div className="dropdown dropdown-end">
           <button tabIndex={0} className="btn btn-ghost btn-sm">
             {LANGUAGES.find((l) => l.code === i18n.language)?.flag ?? '🌐'}

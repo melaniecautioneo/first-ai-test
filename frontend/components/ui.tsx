@@ -64,12 +64,20 @@ export function TagChip({ tag, onRemove }: { tag: Tag; onRemove?: () => void }) 
 
 export function ErrorBanner({ message, onRetry }: { message: string; onRetry?: () => void }) {
   const { t } = useTranslation()
-  const text =
-    message === 'network' ? t('error.network', { url: API_URL }) : t('error.generic', { message })
+
+  // Opérations refusées par le serveur pendant une synchro : c'est un
+  // avertissement, pas une panne — l'application reste utilisable.
+  const dropped = message.startsWith('sync.dropped:')
+  const text = dropped
+    ? t('sync.dropped', { count: Number(message.split(':')[1]) || 0 })
+    : message === 'network'
+      ? t('sync.offlineHint')
+      : t('error.generic', { message })
+
   return (
-    <div className="alert alert-error my-4">
+    <div className={`alert my-4 ${dropped ? 'alert-warning' : 'alert-error'}`}>
       <span>
-        <strong>{t('error.title')} — </strong>
+        {!dropped && <strong>{t('error.title')} — </strong>}
         {text}
       </span>
       {onRetry && (

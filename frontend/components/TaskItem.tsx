@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Task } from '../lib/api'
+import { href } from '../lib/links'
 import { useTodos } from '../lib/store'
 import { DueBadge, PriorityBadge, StatusBadge, TagChip } from './ui'
 
@@ -52,7 +53,7 @@ export function TaskItem({ task, onEdit }: { task: Task; onEdit: (t: Task) => vo
 
           <div className="mt-1 flex flex-wrap items-center gap-3 text-xs opacity-60">
             {project && (
-              <a href={`/project/${project.id}`} className="hover:underline">
+              <a href={href(`/project?id=${project.id}`)} className="hover:underline">
                 {project.emoji} {project.name}
               </a>
             )}

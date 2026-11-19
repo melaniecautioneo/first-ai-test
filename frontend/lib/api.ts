@@ -7,8 +7,16 @@
  * sans toucher aux composants, puisque tout passe par ce fichier.
  */
 
-export const API_URL =
-  (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8080/graphql'
+/**
+ * Adresse de l'API GraphQL.
+ *
+ * `VITE_API_URL=""` (chaîne vide) = mode 100 % local : l'application ne tente
+ * aucun appel réseau et stocke tout dans le navigateur. C'est le réglage
+ * utilisé pour la version publiée sur GitHub Pages, qui n'a pas de backend.
+ */
+const RAW_API_URL = import.meta.env.VITE_API_URL as string | undefined
+export const API_URL = (RAW_API_URL ?? 'http://localhost:8080/graphql').trim()
+export const SYNC_ENABLED = API_URL !== ''
 
 export class GraphQLError extends Error {
   constructor(message: string) {
@@ -120,6 +128,38 @@ const TASK_FIELDS = `
 const PROJECT_FIELDS = `id name color emoji archived taskCount doneCount`
 
 export const api = {
+  /** Récupère TOUT (projets, étiquettes, tâches à plat) pour la synchronisation. */
+  pull: () =>
+    gql<{
+      projects: Project[]
+      tags: Tag[]
+      tasks: {
+        id: number
+        projectId: number | null
+        parentId: number | null
+        title: string
+        notes: string | null
+        status: TaskStatus
+        priority: Priority
+        dueAt: string | null
+        position: number
+        createdAt: string
+        updatedAt: string
+        completedAt: string | null
+        tags: { id: number }[]
+      }[]
+    }>(
+      `query Pull {
+         projects(includeArchived: true) { ${PROJECT_FIELDS} }
+         tags { id name color }
+         tasks(filter: { rootsOnly: false }, sort: MANUAL, limit: 1000) {
+           id projectId parentId title notes status priority dueAt position
+           createdAt updatedAt completedAt
+           tags { id }
+         }
+       }`
+    ),
+
   bootstrap: (filter: TaskFilter, sort: TaskSort) =>
     gql<{ projects: Project[]; tags: Tag[]; tasks: Task[]; stats: Stats }>(
       `query Bootstrap($filter: TaskFilter, $sort: TaskSort!, $statsProject: Int) {

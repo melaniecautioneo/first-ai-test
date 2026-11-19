@@ -12,10 +12,22 @@ const TAG_COLORS = ['#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#647
 export default function Page() {
   const { t, i18n } = useTranslation()
   const [theme, setTheme] = useTheme()
-  const { tags, createTag, deleteTag, deleteCompleted, busy } = useTodos()
+  const { tags, createTag, deleteTag, deleteCompleted, busy, sync, syncNow, resetLocalData } =
+    useTodos()
   const [tagName, setTagName] = useState('')
   const [tagColor, setTagColor] = useState(TAG_COLORS[0])
   const [message, setMessage] = useState<string | null>(null)
+
+  /** Télécharge une sauvegarde JSON des données du navigateur. */
+  const exportJson = () => {
+    const raw = window.localStorage.getItem('todo.state.v1') ?? '{}'
+    const url = URL.createObjectURL(new Blob([raw], { type: 'application/json' }))
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `todo-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   return (
     <div className="space-y-4">
@@ -121,9 +133,56 @@ export default function Page() {
       </section>
 
       <section className="card bg-base-100 shadow-sm">
+        <div className="card-body gap-3 p-4">
+          <h2 className="card-title text-base">🔄 {t('sync.title')}</h2>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="badge badge-lg">{t(`sync.${sync.status}`)}</span>
+            <span className="text-sm opacity-70">
+              {sync.pending > 0 ? t('sync.pending', { count: sync.pending }) : t('sync.upToDate')}
+            </span>
+            <button
+              className="btn btn-sm"
+              disabled={!sync.enabled || sync.status === 'syncing'}
+              onClick={() => void syncNow()}
+            >
+              {t('sync.now')}
+            </button>
+          </div>
+          <p className="text-xs opacity-60">
+            {t('sync.last', {
+              date: sync.lastSyncAt
+                ? new Date(sync.lastSyncAt).toLocaleString(i18n.language)
+                : t('sync.never')
+            })}
+          </p>
+          {!sync.enabled && <p className="text-xs opacity-60">{t('sync.localOnly')}</p>}
+        </div>
+      </section>
+
+      <section className="card bg-base-100 shadow-sm">
+        <div className="card-body gap-3 p-4">
+          <h2 className="card-title text-base">💾 {t('data.title')}</h2>
+          <p className="text-sm opacity-70">{t('data.storage')}</p>
+          <div className="flex flex-wrap gap-2">
+            <button className="btn btn-sm" onClick={exportJson}>
+              ⬇️ {t('data.export')}
+            </button>
+            <button
+              className="btn btn-outline btn-error btn-sm"
+              onClick={() => {
+                if (window.confirm(t('data.resetConfirm'))) resetLocalData()
+              }}
+            >
+              ♻️ {t('data.reset')}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="card bg-base-100 shadow-sm">
         <div className="card-body gap-1 p-4">
           <h2 className="card-title text-base">🔌 {t('settings.api')}</h2>
-          <code className="text-sm opacity-80">{API_URL}</code>
+          <code className="text-sm opacity-80">{API_URL || '—'}</code>
           <p className="text-xs opacity-60">{t('settings.apiHint')}</p>
         </div>
       </section>

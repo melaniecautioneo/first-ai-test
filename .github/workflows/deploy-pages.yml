@@ -1,0 +1,79 @@
+# Construit le frontend et le publie sur GitHub Pages.
+#
+# Déclenchement : à chaque push sur `main`, ou manuellement
+# (onglet Actions -> "Deploy frontend to GitHub Pages" -> "Run workflow").
+#
+# Le site publié fonctionne SANS backend : les données sont stockées dans le
+# navigateur (localStorage). Pour le brancher plus tard sur une API, il suffit
+# de renseigner la variable de dépôt API_URL
+# (Settings -> Secrets and variables -> Actions -> Variables).
+
+name: Deploy frontend to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Un seul déploiement à la fois ; on laisse finir celui en cours.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Vérifier les types
+        run: npm run typecheck
+
+      - name: Construire le site
+        env:
+          # GitHub Pages sert le site sous /<nom-du-depot>/
+          BASE_PATH: /${{ github.event.repository.name }}/
+          # Vide = mode 100 % local (aucun backend). Renseignez la variable
+          # de dépôt API_URL pour activer la synchronisation.
+          VITE_API_URL: ${{ vars.API_URL }}
+        run: npm run build
+
+      - name: Page de repli pour les URL inconnues
+        run: cp dist/client/index.html dist/client/404.html
+
+      - name: Empêcher Jekyll de masquer les fichiers _*
+        run: touch dist/client/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist/client
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

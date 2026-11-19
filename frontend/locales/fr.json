@@ -130,5 +130,31 @@
     "title": "Oups",
     "network": "Impossible de joindre l'API ({{url}}). Le serveur Rust est-il démarré ?",
     "generic": "Une erreur est survenue : {{message}}"
+  },
+  "sync": {
+    "title": "Synchronisation",
+    "disabled": "Mode local",
+    "offline": "Hors ligne",
+    "syncing": "Synchronisation…",
+    "synced": "Synchronisé",
+    "error": "Erreur de synchro",
+    "pending_one": "{{count}} modification en attente",
+    "pending_other": "{{count}} modifications en attente",
+    "upToDate": "Tout est envoyé",
+    "now": "Synchroniser maintenant",
+    "last": "Dernière synchro : {{date}}",
+    "never": "jamais",
+    "dropped": "{{count}} modification(s) refusée(s) par le serveur et abandonnée(s).",
+    "localOnly": "Aucun serveur configuré : les données restent dans ce navigateur.",
+    "offlineHint": "Serveur injoignable. Vos modifications sont gardées et seront envoyées au retour du réseau."
+  },
+  "data": {
+    "title": "Données",
+    "storage": "Vos tâches sont stockées dans ce navigateur (localStorage).",
+    "reset": "Réinitialiser les données locales",
+    "resetConfirm": "Effacer toutes les données de ce navigateur et recharger la démo ?",
+    "export": "Exporter (JSON)",
+    "import": "Importer (JSON)",
+    "importError": "Fichier invalide."
   }
 }

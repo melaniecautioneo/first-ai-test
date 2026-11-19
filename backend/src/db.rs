@@ -2,8 +2,8 @@
 
 use anyhow::Result;
 use chrono::{Duration, Utc};
-use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use sqlx::SqlitePool;
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
 
 pub type Db = SqlitePool;
@@ -76,16 +76,73 @@ pub async fn seed_if_empty(pool: &Db) -> Result<()> {
     }
 
     // (titre, projet, statut, priorité, échéance en jours, tags)
-    let tasks: [(&str, usize, &str, &str, Option<i64>, &[usize]); 9] = [
-        ("Préparer la revue de sprint", 0, "in_progress", "high", Some(1), &[1]),
-        ("Répondre aux e-mails clients", 0, "todo", "urgent", Some(0), &[0]),
-        ("Mettre à jour la documentation API", 0, "todo", "medium", Some(5), &[]),
-        ("Corriger le bug de connexion", 0, "done", "urgent", Some(-2), &[0]),
+    type SeedTask = (
+        &'static str,
+        usize,
+        &'static str,
+        &'static str,
+        Option<i64>,
+        &'static [usize],
+    );
+    let tasks: [SeedTask; 9] = [
+        (
+            "Préparer la revue de sprint",
+            0,
+            "in_progress",
+            "high",
+            Some(1),
+            &[1],
+        ),
+        (
+            "Répondre aux e-mails clients",
+            0,
+            "todo",
+            "urgent",
+            Some(0),
+            &[0],
+        ),
+        (
+            "Mettre à jour la documentation API",
+            0,
+            "todo",
+            "medium",
+            Some(5),
+            &[],
+        ),
+        (
+            "Corriger le bug de connexion",
+            0,
+            "done",
+            "urgent",
+            Some(-2),
+            &[0],
+        ),
         ("Faire les courses", 1, "todo", "low", Some(2), &[3]),
-        ("Réserver le billet de train", 1, "todo", "medium", Some(-1), &[]),
+        (
+            "Réserver le billet de train",
+            1,
+            "todo",
+            "medium",
+            Some(-1),
+            &[],
+        ),
         ("Appeler le garage", 1, "done", "low", Some(-3), &[]),
-        ("Finir le chapitre sur GraphQL", 2, "in_progress", "medium", Some(3), &[2]),
-        ("Exercices Rust : ownership", 2, "todo", "high", Some(7), &[2]),
+        (
+            "Finir le chapitre sur GraphQL",
+            2,
+            "in_progress",
+            "medium",
+            Some(3),
+            &[2],
+        ),
+        (
+            "Exercices Rust : ownership",
+            2,
+            "todo",
+            "high",
+            Some(7),
+            &[2],
+        ),
     ];
 
     for (i, (title, p, status, priority, due_days, tag_idx)) in tasks.iter().enumerate() {
@@ -98,7 +155,11 @@ pub async fn seed_if_empty(pool: &Db) -> Result<()> {
                 .unwrap()
                 .and_utc()
         });
-        let completed = if *status == "done" { Some(now - Duration::days(1)) } else { None };
+        let completed = if *status == "done" {
+            Some(now - Duration::days(1))
+        } else {
+            None
+        };
         let task_id: i64 = sqlx::query_scalar(
             "INSERT INTO tasks
                (project_id, title, status, priority, due_at, position, created_at, updated_at, completed_at)
@@ -130,9 +191,13 @@ pub async fn seed_if_empty(pool: &Db) -> Result<()> {
         .bind("Préparer la revue de sprint")
         .fetch_one(pool)
         .await?;
-    for (i, sub) in ["Rassembler les métriques", "Écrire les slides", "Répéter la démo"]
-        .iter()
-        .enumerate()
+    for (i, sub) in [
+        "Rassembler les métriques",
+        "Écrire les slides",
+        "Répéter la démo",
+    ]
+    .iter()
+    .enumerate()
     {
         sqlx::query(
             "INSERT INTO tasks (project_id, parent_id, title, status, priority, position, created_at, updated_at)

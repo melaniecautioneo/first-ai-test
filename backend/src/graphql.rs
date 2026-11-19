@@ -272,11 +272,7 @@ impl QueryRoot {
     async fn stats(&self, ctx: &Context<'_>, project_id: Option<i64>) -> Result<Stats> {
         let pool = db(ctx);
         let now = Utc::now();
-        let end_of_day = now
-            .date_naive()
-            .and_hms_opt(23, 59, 59)
-            .unwrap()
-            .and_utc();
+        let end_of_day = now.date_naive().and_hms_opt(23, 59, 59).unwrap().and_utc();
         let week_ago = now - Duration::days(7);
 
         // Le filtre "projet" est ajouté AVANT la condition, sinon un
@@ -310,7 +306,9 @@ impl QueryRoot {
         let overdue: i64 = qb.build_query_scalar().fetch_one(pool).await?;
 
         let mut qb = counter("t.status <> 'done' AND t.due_at IS NOT NULL AND t.due_at >= ");
-        qb.push_bind(now).push(" AND t.due_at <= ").push_bind(end_of_day);
+        qb.push_bind(now)
+            .push(" AND t.due_at <= ")
+            .push_bind(end_of_day);
         let due_today: i64 = qb.build_query_scalar().fetch_one(pool).await?;
 
         let mut qb = counter("t.completed_at IS NOT NULL AND t.completed_at >= ");
@@ -366,7 +364,9 @@ impl MutationRoot {
         let pool = db(ctx);
         let name = input.name.trim();
         if name.is_empty() {
-            return Err(async_graphql::Error::new("le nom du projet est obligatoire"));
+            return Err(async_graphql::Error::new(
+                "le nom du projet est obligatoire",
+            ));
         }
         let next_pos: f64 =
             sqlx::query_scalar("SELECT CAST(IFNULL(MAX(position), -1) + 1 AS REAL) FROM projects")
@@ -384,10 +384,12 @@ impl MutationRoot {
         .fetch_one(pool)
         .await?;
 
-        Ok(sqlx::query_as::<_, Project>("SELECT * FROM projects WHERE id = ?")
-            .bind(id)
-            .fetch_one(pool)
-            .await?)
+        Ok(
+            sqlx::query_as::<_, Project>("SELECT * FROM projects WHERE id = ?")
+                .bind(id)
+                .fetch_one(pool)
+                .await?,
+        )
     }
 
     async fn update_project(
@@ -443,21 +445,30 @@ impl MutationRoot {
 
     // ---- Étiquettes -------------------------------------------------------
 
-    async fn create_tag(&self, ctx: &Context<'_>, name: String, color: Option<String>) -> Result<Tag> {
+    async fn create_tag(
+        &self,
+        ctx: &Context<'_>,
+        name: String,
+        color: Option<String>,
+    ) -> Result<Tag> {
         let pool = db(ctx);
         let name = name.trim().to_lowercase();
         if name.is_empty() {
-            return Err(async_graphql::Error::new("le nom de l'étiquette est obligatoire"));
+            return Err(async_graphql::Error::new(
+                "le nom de l'étiquette est obligatoire",
+            ));
         }
         sqlx::query("INSERT OR IGNORE INTO tags (name, color) VALUES (?, ?)")
             .bind(&name)
             .bind(color.unwrap_or_else(|| "#64748b".into()))
             .execute(pool)
             .await?;
-        Ok(sqlx::query_as::<_, Tag>("SELECT * FROM tags WHERE name = ?")
-            .bind(&name)
-            .fetch_one(pool)
-            .await?)
+        Ok(
+            sqlx::query_as::<_, Tag>("SELECT * FROM tags WHERE name = ?")
+                .bind(&name)
+                .fetch_one(pool)
+                .await?,
+        )
     }
 
     async fn delete_tag(&self, ctx: &Context<'_>, id: i64) -> Result<bool> {
@@ -501,7 +512,11 @@ impl MutationRoot {
         .bind(next_pos)
         .bind(now)
         .bind(now)
-        .bind(if status == TaskStatus::Done { Some(now) } else { None })
+        .bind(if status == TaskStatus::Done {
+            Some(now)
+        } else {
+            None
+        })
         .fetch_one(pool)
         .await?;
 
@@ -537,6 +552,13 @@ impl MutationRoot {
         if let Some(p) = patch.priority {
             sqlx::query("UPDATE tasks SET priority = ? WHERE id = ?")
                 .bind(p)
+                .bind(id)
+                .execute(pool)
+                .await?;
+        }
+        if let Some(pos) = patch.position {
+            sqlx::query("UPDATE tasks SET position = ? WHERE id = ?")
+                .bind(pos)
                 .bind(id)
                 .execute(pool)
                 .await?;
@@ -629,9 +651,10 @@ impl MutationRoot {
         let pool = db(ctx);
         let new_pos: f64 = match after_id {
             None => {
-                let min: f64 = sqlx::query_scalar("SELECT CAST(IFNULL(MIN(position), 0) AS REAL) FROM tasks")
-                    .fetch_one(pool)
-                    .await?;
+                let min: f64 =
+                    sqlx::query_scalar("SELECT CAST(IFNULL(MIN(position), 0) AS REAL) FROM tasks")
+                        .fetch_one(pool)
+                        .await?;
                 min - 1.0
             }
             Some(after) => {
@@ -659,7 +682,11 @@ impl MutationRoot {
     }
 
     /// Supprime toutes les tâches terminées (d'un projet, ou de partout).
-    async fn delete_completed_tasks(&self, ctx: &Context<'_>, project_id: Option<i64>) -> Result<i64> {
+    async fn delete_completed_tasks(
+        &self,
+        ctx: &Context<'_>,
+        project_id: Option<i64>,
+    ) -> Result<i64> {
         let pool = db(ctx);
         let res = match project_id {
             Some(p) => {

@@ -4,8 +4,13 @@ Application de gestion de tâches, construite exactement avec la pile imposée :
 
 | Partie       | Technologies                                                        |
 | ------------ | ------------------------------------------------------------------- |
-| **Frontend** | Vike (SSR) · React 19 · Tailwind 4 + daisyUI 5 · i18next (FR/EN) · TypeScript |
+| **Frontend** | Vike (SSR + pré-rendu) · React 19 · Tailwind 4 + daisyUI 5 · i18next (FR/EN) · TypeScript |
 | **Backend**  | Rust · axum · async-graphql · SQLx · SQLite                          |
+| **Hébergement** | GitHub Pages (frontend, statique) · backend à héberger ailleurs  |
+
+L'application est **« local-first »** : elle enregistre tout dans le navigateur
+et fonctionne sans backend. Quand le serveur Rust est joignable, les
+modifications faites hors ligne lui sont envoyées automatiquement.
 
 ---
 
@@ -59,6 +64,9 @@ npm run dev
 - **Bilingue** français / anglais, changeable à chaud (i18next).
 - **7 thèmes** daisyUI (clair, sombre, dracula, nord…), mémorisés.
 - **Responsive** : barre latérale fixe sur grand écran, tiroir sur mobile.
+- **Hors ligne complet** : tout est enregistré dans le navigateur ; les
+  modifications partent vers le serveur dès qu'il répond (voir le chapitre 8).
+- **Export JSON** de vos données depuis les réglages.
 
 ---
 
@@ -75,12 +83,16 @@ backend/
 frontend/
   pages/+config.ts           Configuration globale Vike
   pages/index/+Page.tsx      Page d'accueil (toutes les tâches)
-  pages/project/@id/+Page.tsx  Page d'un projet (/project/2)
+  pages/project/+Page.tsx    Page d'un projet (/project?id=2)
   pages/settings/+Page.tsx   Réglages (langue, thème, étiquettes)
   layouts/LayoutDefault.tsx  Mise en page commune (barre latérale + en-tête)
   components/                Les briques d'interface
   lib/api.ts                 Client GraphQL + toutes les requêtes
   lib/store.tsx              État global (données + actions)
+  lib/offline/state.ts       Données stockées dans le navigateur
+  lib/offline/engine.ts      Les règles métier, côté client
+  lib/offline/sync.ts        Rejeu de la file d'attente vers le serveur
+  lib/links.ts               Liens internes (gère le préfixe GitHub Pages)
   lib/i18n.ts                Configuration i18next
   locales/fr.json, en.json   Les traductions
   css/tailwind.css           Tailwind + daisyUI
@@ -166,6 +178,9 @@ Réinitialiser la base (le jeu de démo sera réinséré) :
 rm backend/todo.db*
 ```
 
+Réinitialiser les données du navigateur : bouton **Réinitialiser les données
+locales** dans les réglages de l'application.
+
 ---
 
 ## 7. Configuration
@@ -186,7 +201,122 @@ cp frontend/.env.example frontend/.env
 
 ---
 
-## 8. Pistes pour la suite
+## 8. Le mode hors ligne (local-first)
+
+### Pourquoi
+
+Le frontend est publié sur GitHub Pages, qui ne sait servir que des fichiers :
+pas de serveur, donc pas d'API. L'application doit donc savoir fonctionner
+seule — et cela la rend aussi utilisable dans le train.
+
+### Comment ça marche
+
+```
+   composant React
+        │  useTodos()
+        ▼
+   moteur local  ──────────────►  localStorage   (source de vérité immédiate)
+        │
+        │  chaque écriture ajoute une opération
+        ▼
+   file d'attente (outbox)  ────►  serveur Rust  (quand il répond)
+```
+
+| Fichier | Rôle |
+| --- | --- |
+| `lib/offline/state.ts`  | La forme des données stockées, la lecture/écriture localStorage, le jeu de démo |
+| `lib/offline/engine.ts` | Les mêmes règles que le backend (créer, filtrer, trier, statistiques), en pur TypeScript |
+| `lib/offline/sync.ts`   | Rejeu de la file, correspondance des ids, relecture du serveur |
+| `lib/store.tsx`         | Le contexte React qui relie tout ça aux composants |
+
+Les trois temps d'une synchronisation :
+
+1. **Rejouer** — les opérations en attente partent vers GraphQL, dans l'ordre.
+2. **Remapper** — une tâche créée hors ligne porte un id négatif (`-12`) ; le
+   serveur lui attribue un vrai id (`42`), et `-12` est remplacé partout.
+3. **Relire** — une fois la file vide, l'état du serveur est récupéré et fait
+   autorité.
+
+Détails qui comptent :
+
+- Une bascule « terminé / à faire » est enregistrée comme un **statut absolu**,
+  jamais comme un « inverse-le » : rejouer deux fois la même opération donne le
+  même résultat.
+- Si le réseau coupe en plein rejeu, les opérations restantes sont conservées.
+- Une opération refusée par le serveur (entité déjà supprimée ailleurs) est
+  abandonnée et comptée ; un bandeau l'indique.
+- Le compte rendu de synchronisation est appliqué à l'état **courant**, pas à
+  celui d'il y a trois secondes : une case cochée pendant l'appel réseau n'est
+  jamais perdue.
+- Le jeu de démonstration n'est chargé que si aucun serveur n'est joignable.
+  Sinon vous modifieriez des tâches qui n'existent pas côté serveur, et ces
+  modifications seraient impossibles à envoyer.
+
+### Limite connue
+
+Les ids sont des entiers attribués par SQLite, d'où l'étape de
+« remappage ». La solution propre, le jour où le backend sera hébergé : des
+identifiants **UUID générés par le navigateur**, qui supprime complètement
+cette étape et les cas limites qui vont avec.
+
+---
+
+## 9. Déploiement
+
+### Frontend — GitHub Pages (automatique)
+
+Le workflow `.github/workflows/deploy-pages.yml` se déclenche à chaque push sur
+`main` qui touche `frontend/`. Il construit le site et le publie.
+
+Prérequis, une seule fois :
+
+1. Le dépôt doit être **public** (GitHub Pages est payant sur un dépôt privé).
+2. *Settings → Pages → Source* : choisir **GitHub Actions**.
+
+Le site sera sur `https://<compte>.github.io/<depot>/`.
+
+Trois détails rendent cela possible :
+
+- `BASE_PATH=/<depot>/` — le site ne vit pas à la racine du domaine ;
+  tous les liens passent par `href()` (`lib/links.ts`).
+- `prerender: true` — Vike écrit de vrais fichiers HTML au lieu d'attendre un
+  serveur.
+- La page d'un projet est `/project?id=5` et non `/project/5` : un seul fichier
+  `project/index.html` couvre tous les projets, ce qu'un hébergeur statique sait
+  servir. (`404.html` sert de filet pour les URL inconnues.)
+
+Pour tester le résultat exactement comme GitHub Pages le servira :
+
+```bash
+cd frontend && BASE_PATH=/first-ai-test/ VITE_API_URL= npm run build
+cp dist/client/index.html dist/client/404.html
+cd .. && python3 scripts/serve-pages.py 4173 /first-ai-test/
+# -> http://localhost:4173/first-ai-test/
+```
+
+### Brancher un backend plus tard
+
+Quand le serveur Rust sera hébergé quelque part :
+
+*Settings → Secrets and variables → Actions → Variables* → créer `API_URL`
+avec l'URL publique de `/graphql`. Le prochain déploiement activera la
+synchronisation, sans changer une ligne de code.
+
+⚠️ L'API devra être en **HTTPS** (une page servie en HTTPS ne peut pas appeler
+une API en HTTP) et autoriser le domaine `github.io` en CORS — c'est déjà le
+cas, `main.rs` autorise toutes les origines.
+
+### Backend — pistes d'hébergement gratuit
+
+| Service | Pour SQLite |
+| --- | --- |
+| **Fly.io** | Volume persistant : le fichier `todo.db` survit aux redémarrages. Le plus proche de votre setup actuel. |
+| **Shuttle.rs** | Natif Rust, déploiement en une commande ; SQLite via volume ou leur Postgres. |
+| **Railway / Render** | Simples, mais le disque est éphémère sur les offres gratuites → préférer Postgres (changement de `sqlx` à prévoir). |
+
+---
+
+## 10. Pistes pour la suite
 
 - **Authentification** (JWT ou cookie de session) — le schéma est prêt à
   recevoir une colonne `user_id`.
