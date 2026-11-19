@@ -47,7 +47,8 @@
     "emptyFiltered": "No task matches the current filters.",
     "count_one": "{{count}} task",
     "count_other": "{{count}} tasks",
-    "subtaskProgress": "{{done}}/{{total}} subtasks"
+    "subtaskProgress": "{{done}}/{{total}} subtasks",
+    "details": "Details"
   },
   "status": {
     "TODO": "To do",

@@ -52,7 +52,10 @@ npm run dev
 - **Projets** : couleur, icône, avancement en %, archivage, suppression en
   cascade.
 - **Étiquettes** multicolores, partagées entre les tâches.
-- **Saisie rapide** avec une mini-syntaxe :
+- **Formulaire de création complet** : un bouton « Détails » ouvre les
+  sélecteurs **statut**, **priorité**, **projet**, **échéance** et
+  **étiquettes**. Un récapitulatif sous le champ montre ce qui sera enregistré.
+- **Saisie rapide** avec une mini-syntaxe (elle pilote les mêmes sélecteurs) :
   `Rappeler le client !urgent @demain #téléphone`
   - `!low` `!medium` `!high` `!urgent` (ou `!1`…`!4`, et les mots français)
   - `@today` `@demain` `@+3d` `@2026-03-04` `@04/03`
