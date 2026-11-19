@@ -1,0 +1,134 @@
+{
+  "app": {
+    "title": "Tâches",
+    "subtitle": "Votre liste de tâches, en mieux"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "allTasks": "Toutes les tâches",
+    "today": "Aujourd'hui",
+    "overdue": "En retard",
+    "projects": "Projets",
+    "settings": "Réglages",
+    "inbox": "Sans projet"
+  },
+  "stats": {
+    "total": "Total",
+    "todo": "À faire",
+    "inProgress": "En cours",
+    "done": "Terminées",
+    "overdue": "En retard",
+    "dueToday": "Pour aujourd'hui",
+    "completedThisWeek": "Finies cette semaine",
+    "progress": "Avancement"
+  },
+  "task": {
+    "newPlaceholder": "Ajouter une tâche… (Entrée pour valider)",
+    "add": "Ajouter",
+    "title": "Titre",
+    "notes": "Notes",
+    "notesPlaceholder": "Détails, liens, contexte…",
+    "due": "Échéance",
+    "noDue": "Pas d'échéance",
+    "priority": "Priorité",
+    "status": "Statut",
+    "project": "Projet",
+    "tags": "Étiquettes",
+    "subtasks": "Sous-tâches",
+    "subtaskPlaceholder": "Ajouter une sous-tâche…",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "created": "Créée le {{date}}",
+    "completedOn": "Terminée le {{date}}",
+    "deleteConfirm": "Supprimer « {{title}} » ?",
+    "empty": "Aucune tâche ici. Profitez-en, ou ajoutez-en une !",
+    "emptyFiltered": "Aucune tâche ne correspond aux filtres.",
+    "count_one": "{{count}} tâche",
+    "count_other": "{{count}} tâches",
+    "subtaskProgress": "{{done}}/{{total}} sous-tâches"
+  },
+  "status": {
+    "TODO": "À faire",
+    "IN_PROGRESS": "En cours",
+    "DONE": "Terminée"
+  },
+  "priority": {
+    "LOW": "Basse",
+    "MEDIUM": "Moyenne",
+    "HIGH": "Haute",
+    "URGENT": "Urgente"
+  },
+  "sort": {
+    "label": "Trier",
+    "MANUAL": "Ordre manuel",
+    "CREATED_DESC": "Plus récentes",
+    "CREATED_ASC": "Plus anciennes",
+    "DUE_ASC": "Échéance (proche)",
+    "DUE_DESC": "Échéance (lointaine)",
+    "PRIORITY_DESC": "Priorité",
+    "TITLE_ASC": "Titre (A→Z)"
+  },
+  "filter": {
+    "search": "Rechercher…",
+    "status": "Statut",
+    "priority": "Priorité",
+    "tags": "Étiquettes",
+    "overdueOnly": "En retard uniquement",
+    "clear": "Réinitialiser",
+    "active": "{{count}} filtre(s) actif(s)"
+  },
+  "project": {
+    "new": "Nouveau projet",
+    "name": "Nom du projet",
+    "color": "Couleur",
+    "emoji": "Icône",
+    "create": "Créer",
+    "rename": "Renommer",
+    "archive": "Archiver",
+    "unarchive": "Désarchiver",
+    "delete": "Supprimer le projet",
+    "deleteConfirm": "Supprimer « {{name}} » et toutes ses tâches ?",
+    "notFound": "Projet introuvable",
+    "empty": "Aucun projet pour l'instant."
+  },
+  "tag": {
+    "manage": "Gérer les étiquettes",
+    "new": "Nouvelle étiquette",
+    "name": "Nom",
+    "deleteConfirm": "Supprimer l'étiquette « {{name}} » ?"
+  },
+  "settings": {
+    "title": "Réglages",
+    "language": "Langue",
+    "theme": "Thème",
+    "api": "Adresse de l'API",
+    "apiHint": "Modifiable via la variable d'environnement VITE_API_URL.",
+    "cleanup": "Maintenance",
+    "deleteCompleted": "Supprimer les tâches terminées",
+    "deleteCompletedConfirm": "Supprimer définitivement toutes les tâches terminées ?",
+    "deletedCount": "{{count}} tâche(s) supprimée(s)."
+  },
+  "date": {
+    "today": "Aujourd'hui",
+    "tomorrow": "Demain",
+    "yesterday": "Hier",
+    "inDays": "Dans {{count}} j",
+    "daysAgo": "Il y a {{count}} j"
+  },
+  "common": {
+    "loading": "Chargement…",
+    "retry": "Réessayer",
+    "close": "Fermer",
+    "none": "Aucun",
+    "all": "Tous",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "error": {
+    "title": "Oups",
+    "network": "Impossible de joindre l'API ({{url}}). Le serveur Rust est-il démarré ?",
+    "generic": "Une erreur est survenue : {{message}}"
+  }
+}

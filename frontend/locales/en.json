@@ -1,0 +1,134 @@
+{
+  "app": {
+    "title": "Tasks",
+    "subtitle": "Your todo list, upgraded"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "allTasks": "All tasks",
+    "today": "Today",
+    "overdue": "Overdue",
+    "projects": "Projects",
+    "settings": "Settings",
+    "inbox": "No project"
+  },
+  "stats": {
+    "total": "Total",
+    "todo": "To do",
+    "inProgress": "In progress",
+    "done": "Done",
+    "overdue": "Overdue",
+    "dueToday": "Due today",
+    "completedThisWeek": "Done this week",
+    "progress": "Progress"
+  },
+  "task": {
+    "newPlaceholder": "Add a task… (press Enter)",
+    "add": "Add",
+    "title": "Title",
+    "notes": "Notes",
+    "notesPlaceholder": "Details, links, context…",
+    "due": "Due date",
+    "noDue": "No due date",
+    "priority": "Priority",
+    "status": "Status",
+    "project": "Project",
+    "tags": "Tags",
+    "subtasks": "Subtasks",
+    "subtaskPlaceholder": "Add a subtask…",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "created": "Created on {{date}}",
+    "completedOn": "Completed on {{date}}",
+    "deleteConfirm": "Delete “{{title}}”?",
+    "empty": "Nothing here. Enjoy it, or add a task!",
+    "emptyFiltered": "No task matches the current filters.",
+    "count_one": "{{count}} task",
+    "count_other": "{{count}} tasks",
+    "subtaskProgress": "{{done}}/{{total}} subtasks"
+  },
+  "status": {
+    "TODO": "To do",
+    "IN_PROGRESS": "In progress",
+    "DONE": "Done"
+  },
+  "priority": {
+    "LOW": "Low",
+    "MEDIUM": "Medium",
+    "HIGH": "High",
+    "URGENT": "Urgent"
+  },
+  "sort": {
+    "label": "Sort",
+    "MANUAL": "Manual order",
+    "CREATED_DESC": "Newest first",
+    "CREATED_ASC": "Oldest first",
+    "DUE_ASC": "Due soonest",
+    "DUE_DESC": "Due latest",
+    "PRIORITY_DESC": "Priority",
+    "TITLE_ASC": "Title (A→Z)"
+  },
+  "filter": {
+    "search": "Search…",
+    "status": "Status",
+    "priority": "Priority",
+    "tags": "Tags",
+    "overdueOnly": "Overdue only",
+    "clear": "Reset",
+    "active": "{{count}} active filter(s)"
+  },
+  "project": {
+    "new": "New project",
+    "name": "Project name",
+    "color": "Color",
+    "emoji": "Icon",
+    "create": "Create",
+    "rename": "Rename",
+    "archive": "Archive",
+    "unarchive": "Unarchive",
+    "delete": "Delete project",
+    "deleteConfirm": "Delete “{{name}}” and all its tasks?",
+    "notFound": "Project not found",
+    "empty": "No project yet."
+  },
+  "tag": {
+    "manage": "Manage tags",
+    "new": "New tag",
+    "name": "Name",
+    "deleteConfirm": "Delete the tag “{{name}}”?"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "api": "API address",
+    "apiHint": "Change it with the VITE_API_URL environment variable.",
+    "cleanup": "Maintenance",
+    "deleteCompleted": "Delete completed tasks",
+    "deleteCompletedConfirm": "Permanently delete every completed task?",
+    "deletedCount": "{{count}} task(s) deleted."
+  },
+  "date": {
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "yesterday": "Yesterday",
+    "inDays": "In {{count}}d",
+    "daysAgo": "{{count}}d ago"
+  },
+  "common": {
+    "loading": "Loading…",
+    "retry": "Retry",
+    "close": "Close",
+    "none": "None",
+    "all": "All",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "error": {
+    "title": "Oops",
+    "network": "Cannot reach the API ({{url}}). Is the Rust server running?",
+    "generic": "Something went wrong: {{message}}"
+  }
+}

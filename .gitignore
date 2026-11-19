@@ -1,0 +1,17 @@
+# Rust / backend
+backend/target/
+backend/todo.db
+backend/todo.db-shm
+backend/todo.db-wal
+backend/.env
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env
+frontend/*.log
+
+# Divers
+.DS_Store
+*.swp

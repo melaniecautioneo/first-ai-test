@@ -1,0 +1,39 @@
+@import 'tailwindcss';
+@plugin 'daisyui' {
+  themes: light --default, dark --prefersdark, cupcake, nord, dracula, corporate, synthwave;
+}
+
+/* Petites touches maison par-dessus daisyUI */
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+/* Titre barré quand la tâche est terminée */
+.task-done-title {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+
+/* Barre de couleur du projet sur la gauche d'une carte */
+.project-stripe {
+  width: 4px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+/* Animation d'apparition des cartes de tâches */
+@keyframes task-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.task-enter {
+  animation: task-in 0.18s ease-out;
+}
