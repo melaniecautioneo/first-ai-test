@@ -7,6 +7,11 @@ export default {
   Layout: LayoutDefault,
   title: 'Tâches — Todo',
   description: 'Gestionnaire de tâches : Vike + React + daisyUI + i18next / Rust + GraphQL + SQLite',
+  // Langue du HTML rendu par le serveur. Elle doit correspondre à
+  // DEFAULT_LANGUAGE (lib/i18n.ts) : le serveur rend en français, donc
+  // <html lang="fr">. Le navigateur la corrige si l'utilisateur change
+  // de langue (voir I18nProvider).
+  lang: 'fr',
   extends: vikeReact,
   // Rendu serveur activé (SSR) en développement.
   ssr: true,
