@@ -1,7 +1,7 @@
 /** Petits composants d'affichage réutilisables (badges, états vides…). */
 import { useTranslation } from 'react-i18next'
-import { API_URL, type Priority, type Tag, type TaskStatus } from '../lib/api'
-import { humanDate } from '../lib/dates'
+import { type Priority, type Tag, type TaskStatus } from '../lib/api'
+import { daysUntil, humanDate } from '../lib/dates'
 
 export const PRIORITIES: Priority[] = ['LOW', 'MEDIUM', 'HIGH', 'URGENT']
 export const STATUSES: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'DONE']
@@ -33,15 +33,80 @@ export function StatusBadge({ status }: { status: TaskStatus }) {
   return <span className={`badge badge-sm ${STATUS_CLASS[status]}`}>{t(`status.${status}`)}</span>
 }
 
-export function DueBadge({ dueAt, overdue }: { dueAt: string; overdue: boolean }) {
+/**
+ * L'échéance d'une tâche dans la liste.
+ *
+ * Volontairement PAS un `badge` : la date est l'information qu'on cherche en
+ * premier quand on balaie une liste. Elle est donc alignée à droite, en
+ * texte, et seule l'urgence lui donne une couleur (et un fond si elle est
+ * dépassée). Tout le reste — priorité, statut, étiquettes — est relégué à la
+ * ligne méta, en plus petit.
+ */
+export function DueDate({
+  dueAt,
+  overdue,
+  done
+}: {
+  dueAt: string
+  overdue: boolean
+  done: boolean
+}) {
   const { t, i18n } = useTranslation()
+  const soon = !done && !overdue && daysUntil(dueAt) === 0
+
+  const tone = done
+    ? 'opacity-40'
+    : overdue
+      ? 'rounded bg-error/10 px-1.5 py-0.5 font-semibold text-error'
+      : soon
+        ? 'font-medium text-warning'
+        : 'opacity-60'
+
   return (
     <span
-      className={`badge badge-sm gap-1 ${overdue ? 'badge-error' : 'badge-ghost'}`}
+      className={`shrink-0 text-xs whitespace-nowrap tabular-nums ${tone}`}
       title={new Date(dueAt).toLocaleString(i18n.language)}
     >
-      <span aria-hidden>📅</span>
-      {humanDate(dueAt, t, i18n.language)}
+      <span aria-hidden>{overdue ? '⚠️' : '📅'}</span> {humanDate(dueAt, t, i18n.language)}
+    </span>
+  )
+}
+
+const PRIORITY_DOT: Record<Priority, string> = {
+  LOW: 'bg-base-content/30',
+  MEDIUM: 'bg-info',
+  HIGH: 'bg-warning',
+  URGENT: 'bg-error'
+}
+
+/**
+ * Priorité en pastille de couleur. Le mot n'apparaît que pour « haute » et
+ * « urgente » : afficher « moyenne » sur les trois quarts des tâches ne dit
+ * rien et encombre la lecture.
+ */
+export function PriorityDot({ priority }: { priority: Priority }) {
+  const { t } = useTranslation()
+  const loud = priority === 'HIGH' || priority === 'URGENT'
+  return (
+    <span className="inline-flex items-center gap-1" title={t(`priority.${priority}`)}>
+      <span className={`inline-block h-2 w-2 rounded-full ${PRIORITY_DOT[priority]}`} />
+      {loud && (
+        <span className={priority === 'URGENT' ? 'text-error' : 'text-warning'}>
+          {t(`priority.${priority}`)}
+        </span>
+      )}
+    </span>
+  )
+}
+
+/** Étiquette en contour coloré : se distingue des pastilles pleines. */
+export function TagPill({ tag }: { tag: Tag }) {
+  return (
+    <span
+      className="rounded-full border px-1.5 text-xs whitespace-nowrap"
+      style={{ color: tag.color, borderColor: tag.color }}
+    >
+      {tag.name}
     </span>
   )
 }

@@ -1,10 +1,22 @@
-/** Une tâche dans la liste : case à cocher, badges, sous-tâches, actions. */
+/**
+ * Une tâche dans la liste.
+ *
+ * Hiérarchie visuelle en trois niveaux, pour que l'œil trouve vite :
+ *   1. le TITRE, et l'ÉCHÉANCE alignée à droite (la colonne de dates se lit
+ *      verticalement d'un coup d'œil) ;
+ *   2. la ligne méta en petit et estompé : priorité, statut, projet,
+ *      sous-tâches ;
+ *   3. les étiquettes, en contour coloré.
+ *
+ * Avant, tout était rendu avec le même composant `badge` : rien ne
+ * ressortait et la date se perdait au milieu des autres pastilles.
+ */
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Task } from '../lib/api'
 import { href } from '../lib/links'
 import { useTodos } from '../lib/store'
-import { DueBadge, PriorityBadge, StatusBadge, TagChip } from './ui'
+import { DueDate, PriorityDot, TagPill } from './ui'
 
 export function TaskItem({ task, onEdit }: { task: Task; onEdit: (t: Task) => void }) {
   const { t } = useTranslation()
@@ -12,6 +24,7 @@ export function TaskItem({ task, onEdit }: { task: Task; onEdit: (t: Task) => vo
   const [showSubtasks, setShowSubtasks] = useState(false)
 
   const done = task.status === 'DONE'
+  const running = task.status === 'IN_PROGRESS'
   const project = projects.find((p) => p.id === task.projectId)
   const subDone = task.subtasks.filter((s) => s.status === 'DONE').length
 
@@ -31,42 +44,58 @@ export function TaskItem({ task, onEdit }: { task: Task; onEdit: (t: Task) => vo
           aria-label={task.title}
         />
 
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              className={`text-left font-medium hover:underline ${done ? 'task-done-title' : ''}`}
-              onClick={() => onEdit(task)}
-            >
-              {task.title}
-            </button>
-            {task.dueAt && <DueBadge dueAt={task.dueAt} overdue={task.overdue} />}
-            <PriorityBadge priority={task.priority} />
-            {task.status === 'IN_PROGRESS' && <StatusBadge status={task.status} />}
-            {task.tags.map((tag) => (
-              <TagChip key={tag.id} tag={tag} />
-            ))}
-          </div>
+        {/* Grille : sur grand écran la date occupe une colonne à droite (on
+            lit les échéances verticalement) ; sur mobile elle passe sous le
+            titre, sinon le titre se retrouve écrasé sur trois lignes. */}
+        <div className="grid min-w-0 flex-1 grid-cols-1 gap-x-3 sm:grid-cols-[1fr_auto]">
+          <button
+            className={`text-left font-medium break-words hover:underline sm:col-start-1 sm:row-start-1 ${
+              done ? 'task-done-title' : ''
+            }`}
+            onClick={() => onEdit(task)}
+          >
+            {task.title}
+          </button>
 
-          {task.notes && (
-            <p className="mt-1 line-clamp-2 text-sm opacity-60">{task.notes}</p>
+          {task.dueAt && (
+            <div className="mt-0.5 sm:col-start-2 sm:row-start-1 sm:mt-0 sm:justify-self-end">
+              <DueDate dueAt={task.dueAt} overdue={task.overdue} done={done} />
+            </div>
           )}
 
-          <div className="mt-1 flex flex-wrap items-center gap-3 text-xs opacity-60">
+          {task.notes && (
+            <p className="mt-1 line-clamp-2 text-sm opacity-60 sm:col-span-2">{task.notes}</p>
+          )}
+
+          {/* Niveau 2 : la ligne méta, discrète */}
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs opacity-70 sm:col-span-2">
+            <PriorityDot priority={task.priority} />
+
+            {running && (
+              <span className="font-medium text-primary">▶ {t('status.IN_PROGRESS')}</span>
+            )}
+
             {project && (
               <a href={href(`/project?id=${project.id}`)} className="hover:underline">
                 {project.emoji} {project.name}
               </a>
             )}
+
             {task.subtasks.length > 0 && (
               <button className="hover:underline" onClick={() => setShowSubtasks((s) => !s)}>
                 {showSubtasks ? '▾' : '▸'}{' '}
                 {t('task.subtaskProgress', { done: subDone, total: task.subtasks.length })}
               </button>
             )}
+
+            {/* Niveau 3 : étiquettes */}
+            {task.tags.map((tag) => (
+              <TagPill key={tag.id} tag={tag} />
+            ))}
           </div>
 
           {showSubtasks && task.subtasks.length > 0 && (
-            <ul className="mt-2 space-y-1 border-l border-base-300 pl-3">
+            <ul className="mt-2 space-y-1 border-l border-base-300 pl-3 sm:col-span-2">
               {task.subtasks.map((s) => (
                 <li key={s.id} className="flex items-center gap-2 text-sm">
                   <input
@@ -82,21 +111,26 @@ export function TaskItem({ task, onEdit }: { task: Task; onEdit: (t: Task) => vo
           )}
         </div>
 
-        <div className="flex shrink-0 gap-1">
+        {/* Largeur figée : sans cela, les tâches terminées (sans bouton
+            « démarrer ») décalent la colonne de dates et on perd la lecture
+            verticale. */}
+        <div className="flex w-[5.5rem] shrink-0 justify-end gap-1">
           {!done && (
             <button
               className="btn btn-ghost btn-xs"
               title={t('status.IN_PROGRESS')}
               onClick={() =>
-                void updateTask(task.id, {
-                  status: task.status === 'IN_PROGRESS' ? 'TODO' : 'IN_PROGRESS'
-                })
+                void updateTask(task.id, { status: running ? 'TODO' : 'IN_PROGRESS' })
               }
             >
-              {task.status === 'IN_PROGRESS' ? '⏸️' : '▶️'}
+              {running ? '⏸️' : '▶️'}
             </button>
           )}
-          <button className="btn btn-ghost btn-xs" title={t('task.edit')} onClick={() => onEdit(task)}>
+          <button
+            className="btn btn-ghost btn-xs"
+            title={t('task.edit')}
+            onClick={() => onEdit(task)}
+          >
             ✏️
           </button>
           <button
