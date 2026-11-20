@@ -48,7 +48,8 @@
     "count_one": "{{count}} task",
     "count_other": "{{count}} tasks",
     "subtaskProgress": "{{done}}/{{total}} subtasks",
-    "details": "Details"
+    "details": "Details",
+    "new": "New task"
   },
   "status": {
     "TODO": "To do",
@@ -78,7 +79,8 @@
     "tags": "Tags",
     "overdueOnly": "Overdue only",
     "clear": "Reset",
-    "active": "{{count}} active filter(s)"
+    "active": "{{count}} active filter(s)",
+    "title": "Filters"
   },
   "project": {
     "new": "New project",

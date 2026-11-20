@@ -52,10 +52,15 @@ npm run dev
 - **Projets** : couleur, icône, avancement en %, archivage, suppression en
   cascade.
 - **Étiquettes** multicolores, partagées entre les tâches.
-- **Formulaire de création complet** : un bouton « Détails » ouvre les
-  sélecteurs **statut**, **priorité**, **projet**, **échéance** et
-  **étiquettes**. Un récapitulatif sous le champ montre ce qui sera enregistré.
-- **Saisie rapide** avec une mini-syntaxe (elle pilote les mêmes sélecteurs) :
+- **Interface épurée** : la liste des tâches commence tout en haut. Les
+  statistiques tiennent sur une ligne (cliquable pour filtrer), les filtres
+  détaillés sont repliés derrière un bouton, et la création se fait dans une
+  popin ouverte par le bouton **＋ Nouvelle tâche** (raccourci clavier `n`,
+  `Échap` pour fermer).
+- **Formulaire de création complet** dans la popin : **statut**, **priorité**,
+  **projet**, **échéance** et **étiquettes**, avec un récapitulatif de ce qui
+  sera enregistré.
+- **Saisie rapide** avec une mini-syntaxe (elle pilote les mêmes champs) :
   `Rappeler le client !urgent @demain #téléphone`
   - `!low` `!medium` `!high` `!urgent` (ou `!1`…`!4`, et les mots français)
   - `@today` `@demain` `@+3d` `@2026-03-04` `@04/03`
@@ -89,7 +94,9 @@ frontend/
   pages/project/+Page.tsx    Page d'un projet (/project?id=2)
   pages/settings/+Page.tsx   Réglages (langue, thème, étiquettes)
   layouts/LayoutDefault.tsx  Mise en page commune (barre latérale + en-tête)
-  components/                Les briques d'interface
+  components/Toolbar.tsx     Recherche + tri + filtres repliables + bouton ＋
+  components/TaskForm.tsx    Le formulaire de création (dans la popin)
+  components/                Les autres briques d'interface
   lib/api.ts                 Client GraphQL + toutes les requêtes
   lib/store.tsx              État global (données + actions)
   lib/offline/state.ts       Données stockées dans le navigateur

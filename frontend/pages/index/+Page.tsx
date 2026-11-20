@@ -1,7 +1,6 @@
-import { Filters } from '../../components/Filters'
 import { Stats } from '../../components/Stats'
-import { TaskComposer } from '../../components/TaskComposer'
 import { TaskList } from '../../components/TaskList'
+import { Toolbar } from '../../components/Toolbar'
 import { useTodos } from '../../lib/store'
 
 /** Page d'accueil : toutes les tâches, tous projets confondus. */
@@ -10,8 +9,7 @@ export default function Page() {
   return (
     <>
       <Stats />
-      <TaskComposer projectId={filters.projectId} />
-      <Filters />
+      <Toolbar projectId={filters.projectId} />
       <TaskList />
     </>
   )

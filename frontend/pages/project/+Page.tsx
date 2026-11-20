@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { usePageContext } from 'vike-react/usePageContext'
-import { Filters } from '../../components/Filters'
 import { Stats } from '../../components/Stats'
-import { TaskComposer } from '../../components/TaskComposer'
 import { TaskList } from '../../components/TaskList'
+import { Toolbar } from '../../components/Toolbar'
 import { href, projectIdFromUrl } from '../../lib/links'
 import { useTodos } from '../../lib/store'
 
@@ -97,8 +96,7 @@ export default function Page() {
       </div>
 
       <Stats />
-      <TaskComposer projectId={project.id} />
-      <Filters />
+      <Toolbar projectId={project.id} />
       <TaskList />
     </>
   )

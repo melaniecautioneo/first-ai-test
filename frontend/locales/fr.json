@@ -48,7 +48,8 @@
     "count_one": "{{count}} tâche",
     "count_other": "{{count}} tâches",
     "subtaskProgress": "{{done}}/{{total}} sous-tâches",
-    "details": "Détails"
+    "details": "Détails",
+    "new": "Nouvelle tâche"
   },
   "status": {
     "TODO": "À faire",
@@ -78,7 +79,8 @@
     "tags": "Étiquettes",
     "overdueOnly": "En retard uniquement",
     "clear": "Réinitialiser",
-    "active": "{{count}} filtre(s) actif(s)"
+    "active": "{{count}} filtre(s) actif(s)",
+    "title": "Filtres"
   },
   "project": {
     "new": "Nouveau projet",
