@@ -57,9 +57,10 @@ npm run dev
   détaillés sont repliés derrière un bouton, et la création se fait dans une
   popin ouverte par le bouton **＋ Nouvelle tâche** (raccourci clavier `n`,
   `Échap` pour fermer).
-- **Formulaire de création complet** dans la popin : **statut**, **priorité**,
-  **projet**, **échéance** et **étiquettes**, avec un récapitulatif de ce qui
-  sera enregistré.
+- **Une seule popin** pour créer et pour modifier une tâche : **statut**,
+  **priorité**, **projet**, **échéance**, **étiquettes** (plus notes et
+  sous-tâches en modification). Elle contient un **aperçu en direct** rendu
+  avec les composants de la liste, donc ce qu'on voit est ce qu'on obtient.
 - **Saisie rapide** avec une mini-syntaxe (elle pilote les mêmes champs) :
   `Rappeler le client !urgent @demain #téléphone`
   - `!low` `!medium` `!high` `!urgent` (ou `!1`…`!4`, et les mots français)
@@ -95,7 +96,8 @@ frontend/
   pages/settings/+Page.tsx   Réglages (langue, thème, étiquettes)
   layouts/LayoutDefault.tsx  Mise en page commune (barre latérale + en-tête)
   components/Toolbar.tsx     Recherche + tri + filtres repliables + bouton ＋
-  components/TaskForm.tsx    Le formulaire de création (dans la popin)
+  components/TaskDialog.tsx  LA popin de tâche : création ET modification
+  components/TaskItem.tsx    Une ligne de la liste (titre, échéance, méta)
   components/                Les autres briques d'interface
   lib/api.ts                 Client GraphQL + toutes les requêtes
   lib/store.tsx              État global (données + actions)

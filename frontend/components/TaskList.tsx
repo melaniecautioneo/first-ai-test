@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import type { Task } from '../lib/api'
 import { countActiveFilters, useTodos } from '../lib/store'
 import { TaskItem } from './TaskItem'
-import { TaskModal } from './TaskModal'
+import { TaskDialog } from './TaskDialog'
 import { EmptyState, ErrorBanner, Spinner } from './ui'
 
 export function TaskList() {
@@ -35,7 +35,13 @@ export function TaskList() {
         </>
       )}
 
-      <TaskModal task={editing} onClose={() => setEditingId(null)} />
+      {editing && (
+        <TaskDialog
+          task={editing}
+          projectId={editing.projectId}
+          onClose={() => setEditingId(null)}
+        />
+      )}
     </>
   )
 }

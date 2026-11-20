@@ -49,7 +49,8 @@
     "count_other": "{{count}} tâches",
     "subtaskProgress": "{{done}}/{{total}} sous-tâches",
     "details": "Détails",
-    "new": "Nouvelle tâche"
+    "new": "Nouvelle tâche",
+    "preview": "Aperçu"
   },
   "status": {
     "TODO": "À faire",

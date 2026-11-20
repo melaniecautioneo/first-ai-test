@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Priority, TaskSort, TaskStatus } from '../lib/api'
 import { countActiveFilters, useTodos } from '../lib/store'
-import { TaskForm } from './TaskForm'
+import { TaskDialog } from './TaskDialog'
 import { PRIORITIES, PRIORITY_CLASS, STATUSES, STATUS_CLASS } from './ui'
 
 const SORTS: TaskSort[] = [
@@ -169,19 +169,7 @@ export function Toolbar({ projectId }: { projectId: number | null }) {
         </div>
       )}
 
-      {creating && (
-        <div className="modal modal-open" role="dialog">
-          <div className="modal-box max-w-2xl">
-            <h3 className="mb-4 text-lg font-bold">➕ {t('task.new')}</h3>
-            <TaskForm projectId={projectId} onDone={() => setCreating(false)} />
-          </div>
-          <button
-            className="modal-backdrop"
-            onClick={() => setCreating(false)}
-            aria-label={t('common.close')}
-          />
-        </div>
-      )}
+      {creating && <TaskDialog projectId={projectId} onClose={() => setCreating(false)} />}
     </>
   )
 }

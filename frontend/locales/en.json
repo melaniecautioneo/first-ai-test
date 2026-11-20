@@ -49,7 +49,8 @@
     "count_other": "{{count}} tasks",
     "subtaskProgress": "{{done}}/{{total}} subtasks",
     "details": "Details",
-    "new": "New task"
+    "new": "New task",
+    "preview": "Preview"
   },
   "status": {
     "TODO": "To do",
